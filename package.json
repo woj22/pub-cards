@@ -1,0 +1,6 @@
+{
+  "name": "pub-cards",
+  "private": true,
+  "description": "A browser party card game with British humour. Play with friends by link.",
+  "scripts": { "test": "node tests/core.test.js" }
+}

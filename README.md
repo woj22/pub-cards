@@ -1,0 +1,61 @@
+# Pub Cards
+
+A party card game for terrible people, proper British edition. One person
+hosts, everyone else joins by link or a four-letter room code. It runs in the
+browser on phones and laptops, with no accounts and no server to pay for.
+
+All the cards are original and live in [`cards.js`](cards.js). Add your own:
+a `_` in a prompt marks a blank, and prompts with two blanks ask for two
+answers.
+
+## Playing
+
+1. Open the game and press **Start a game**.
+2. Send the link (or the room code) to your mates.
+3. When everyone's in, press **Start the game**.
+
+The host's browser runs the game, so the host needs to keep their tab open.
+If the host reloads by accident, the game picks up where it left off and
+everyone reconnects by themselves.
+
+## Extras
+
+- **The Bloke Down the Pub**: a bot that plays random cards. He wins more
+  often than he should.
+- **Random events** (from round 3, about one round in three):
+  - *Bank Holiday*: double points.
+  - *Rail Replacement*: everyone passes a random card to the left.
+  - *Pub Vote*: no judge, everyone votes, and you can't vote for yourself.
+  - *Spring Clean*: everyone gets a fresh hand.
+  - *Happy Hour*: everyone gets an extra write-your-own card.
+- **Write your own**: each player gets a few blank cards per game.
+- **Swap your hand**: spend a point to bin your hand and draw a new one.
+- **The Pundit**: reads each winning card aloud in a British voice (uses
+  your device's built-in speech, and you can turn it off).
+- **Reactions**: emoji that float up on everyone's screen.
+- The host can remove players and move things on when someone's gone to the
+  bar.
+
+## How it works
+
+- `core.js`: the rules. Pure functions, run only in the host's browser.
+- `net.js`: connections. Players connect browser to browser with
+  [PeerJS](https://peerjs.com) (MIT licence, bundled in `vendor/`), which uses
+  the free public PeerJS server only to introduce players to each other.
+- `app.js`: the screens.
+
+Add `?local` to the URL to test on your own: each tab becomes a player, and
+tabs talk to each other directly without the internet.
+
+## Hosting
+
+It's a static site. On GitHub: **Settings → Pages → Deploy from a branch →
+`main` / root**. Any static host works too.
+
+## Tests
+
+```
+npm test
+```
+
+simulates 300 random games through the rules engine.
