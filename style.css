@@ -79,7 +79,8 @@ input, select, textarea { font: inherit; }
 .settings select { margin: 0 6px; padding: 4px 6px; border-radius: 6px; background: var(--bg2); color: var(--text); border: 1px solid #3d6b4f; }
 .tog { display: flex; align-items: center; gap: 10px; }
 .tog input { width: 20px; height: 20px; accent-color: var(--brass); }
-.lobby .tog.small, .game .tog.small { margin-top: 18px; }
+.lobby .tog.small, .game .tog.small { margin-top: 14px; }
+#app { padding-bottom: 90px; }
 .wait { color: var(--muted); text-align: center; }
 
 .top { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--muted); }

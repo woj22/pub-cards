@@ -35,6 +35,10 @@ everyone reconnects by themselves.
 - **The Pundit**: reads each winning card aloud in a British voice (uses
   your device's built-in speech, and you can turn it off).
 - **Reactions**: emoji that float up on everyone's screen.
+- **Little Sith**: a pixel-art character who runs and jumps along the bottom
+  of the screen, and does a spin when someone wins a round. Each player can
+  switch him off. Sprites in `img/sith.png` were cut from a sheet jaa
+  supplied.
 - The host can remove players and move things on when someone's gone to the
   bar.
 

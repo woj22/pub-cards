@@ -82,6 +82,8 @@
   let ui = { sel: [], custom: "", writing: false };
   let lastSpoken = null;
   let pundit = store.get("pc-pundit", true);
+  const calm = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let sith = store.get("pc-sith", !calm);
   let status = "";
 
   function rnd() {
@@ -341,6 +343,7 @@
     if ((v.phase === "reveal" || v.phase === "gameover") && lastSpoken !== v.roundNo && v.round && v.round.winners.length) {
       lastSpoken = v.roundNo;
       speakWinner();
+      if (window.Sith) Sith.celebrate();
     }
     render();
   }
@@ -475,7 +478,10 @@
   }
 
   function punditToggle() {
-    return '<label class="tog small"><input type="checkbox" data-act="pundit"' + (pundit ? " checked" : "") + "> The Pundit reads winning cards aloud</label>";
+    return (
+      '<label class="tog small"><input type="checkbox" data-act="pundit"' + (pundit ? " checked" : "") + "> The Pundit reads winning cards aloud</label>" +
+      '<label class="tog small"><input type="checkbox" data-act="sith"' + (sith ? " checked" : "") + "> Little Sith runs about</label>"
+    );
   }
 
   function promptHTML(r, cards) {
@@ -717,6 +723,10 @@
     if (t.dataset.set) {
       const val = t.type === "checkbox" ? t.checked : +t.value;
       send({ t: "settings", patch: { [t.dataset.set]: val } });
+    } else if (t.dataset.act === "sith") {
+      sith = t.checked;
+      store.set("pc-sith", sith);
+      if (window.Sith) Sith.enable(sith);
     } else if (t.dataset.act === "pundit") {
       pundit = t.checked;
       store.set("pc-pundit", pundit);
@@ -743,6 +753,7 @@
   });
 
   if ("speechSynthesis" in window) speechSynthesis.getVoices();
+  if (window.Sith) Sith.enable(sith);
 
   // Host reload: pick the game straight back up.
   const hosting = params.get("hosting");
