@@ -41,6 +41,7 @@ for (let seed = 1; seed <= 300; seed++) {
         }
       } else {
         const jid = s.round.judgeId;
+        if (C.isBotId(jid)) { assert(C.botJudge(s, rnd).ok); continue; }
         const e = C.view(s, jid).round.entries[0];
         assert(C.judge(s, jid, C.entryOwner(s, e.key)).ok);
       }

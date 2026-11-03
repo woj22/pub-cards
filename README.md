@@ -23,7 +23,8 @@ everyone reconnects by themselves.
 
 - **Bots**: up to three (The Bloke Down the Pub, Big Sandra from Bingo and
   Your Uncle Clive) who play random cards and win more often than they
-  should. With two bots you can try the game on your own.
+  should. Bots take their turn as judge too, picking a winner at random.
+  With two bots you can try the game on your own.
 - **Random events** (from round 3, about one round in three):
   - *Bank Holiday*: double points.
   - *Rail Replacement*: everyone passes a random card to the left.

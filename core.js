@@ -165,13 +165,13 @@
     const promptId = s.promptDeck.pop();
     const event = pickEvent(s, rnd);
 
-    // The judge rotates among connected humans; the bot never judges.
+    // The judge rotates round everyone still here, bots included.
     let judgeId = null;
     if (event !== "pubVote") {
       const ps = s.players;
       for (let k = 1; k <= ps.length; k++) {
         const i = (s.judgeIdx + k) % ps.length;
-        if (!ps[i].bot && ps[i].connected) {
+        if (ps[i].bot || ps[i].connected) {
           s.judgeIdx = i;
           judgeId = ps[i].id;
           break;
@@ -211,7 +211,7 @@
     }
     if (event) note(s, EVENTS[event].name + "! " + EVENTS[event].text);
 
-    for (const bot of s.players.filter((p) => p.bot)) {
+    for (const bot of s.players.filter((p) => p.bot && p.id !== judgeId)) {
       const idx = shuffle(bot.hand.map((_, i) => i), rnd).slice(0, s.round.pick);
       s.round.subs[bot.id] = idx.map((i) => ({ card: bot.hand[i] }));
       bot.hand = bot.hand.filter((_, i) => !idx.includes(i));
@@ -295,6 +295,17 @@
     if (by !== r.judgeId) return { ok: false, error: "You're not the judge." };
     if (!r.subs[playerId]) return { ok: false };
     award(s, [playerId]);
+    return { ok: true };
+  }
+
+  // A bot judging picks a winner at random. The host calls this after a pause
+  // so everyone gets to read the entries first.
+  function botJudge(s, rnd) {
+    const r = s.round;
+    if (s.phase !== "judging" || !isBotId(r.judgeId) || r.event === "pubVote") return { ok: false };
+    const judgeName = (player(s, r.judgeId) || {}).name;
+    award(s, [r.order[Math.floor(rnd() * r.order.length)]]);
+    note(s, judgeName + " picked with their eyes shut.");
     return { ok: true };
   }
 
@@ -505,6 +516,7 @@
     start,
     play,
     judge,
+    botJudge,
     vote,
     next,
     skip,

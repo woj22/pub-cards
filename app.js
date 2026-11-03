@@ -108,7 +108,15 @@
     hostSave();
     for (const [cid, pid] of connPlayer) net.send(cid, { t: "view", v: Core.view(game, pid) });
     setView(Core.view(game, myId));
+    // A bot is judging: give everyone a few seconds to read, then it picks.
+    if (game.phase === "judging" && game.round && Core.isBotId(game.round.judgeId) && botTimer !== game.roundNo) {
+      botTimer = game.roundNo;
+      setTimeout(() => {
+        if (role === "host" && Core.botJudge(game, rnd).ok) hostSync();
+      }, 4000);
+    }
   }
+  let botTimer = null;
 
   function hostHandle(pid, m, cid) {
     let r = { ok: false };
@@ -518,7 +526,7 @@
     } else if (v.phase === "judging") {
       if (pubVote) {
         head = r.mySub ? (r.myVote ? '<p class="role">Vote in. Waiting for the others…</p>' : '<p class="role">Vote for your favourite. Not your own, cheeky.</p>') : '<p class="role">Everyone else is voting.</p>';
-      } else head = isJudge ? '<p class="role">Pick the winner.</p>' : '<p class="role">' + esc(name(r.judgeId)) + " is choosing…</p>";
+      } else head = isJudge ? '<p class="role">Pick the winner.</p>' : '<p class="role">' + esc(name(r.judgeId)) + (Core.isBotId(r.judgeId) ? " is squinting at the cards…" : " is choosing…") + "</p>";
       const canPick = (isJudge && !pubVote) || (pubVote && r.mySub && !r.myVote);
       main =
         '<div class="entries">' +
@@ -540,7 +548,7 @@
 
     const showSkip =
       host &&
-      ((v.phase === "playing" && v.players.filter((p) => p.played).length >= 2) || (v.phase === "judging" && (!pubVote ? r.judgeId !== v.me : v.players.some((p) => p.voted))));
+      ((v.phase === "playing" && v.players.filter((p) => p.played).length >= 2) || (v.phase === "judging" && (!pubVote ? r.judgeId !== v.me && !Core.isBotId(r.judgeId) : v.players.some((p) => p.voted))));
     return (
       '<div class="game">' +
       '<div class="top"><span>Round ' + v.roundNo + "</span><span>First to " + v.settings.target + "</span><span>Room " + esc(code) + "</span></div>" +
