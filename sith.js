@@ -5,16 +5,17 @@
   const SHEET = { src: "img/sith.png", w: 242, h: 116, foot: 109 };
   const A = {
     idle: [0, 1, 2, 3],
-    run: [4, 5, 6, 7],
-    crouch: [9],
-    rise: [10],
-    apex: [11],
-    fall: [12],
-    land: [13, 14],
-    slash: [15, 16, 17],
-    spin: [18, 19, 20, 18, 19, 20],
-    dash: [21, 22, 23],
+    run: [4, 5, 6, 7, 8, 9],
+    crouch: [11],
+    rise: [12],
+    apex: [13],
+    fall: [14],
+    land: [15, 16],
+    slash: [17, 18, 19],
+    spin: [20, 21, 22, 20, 21, 22],
+    dash: [23, 24, 25],
   };
+  const FRAMES = 26;
   const SCALE = 0.7;
   const W = SHEET.w * SCALE;
   const GROUND = 4; // px above the bottom edge
@@ -39,7 +40,7 @@
       height: SHEET.h * SCALE + "px",
       backgroundImage: "url(" + SHEET.src + ")",
       backgroundRepeat: "no-repeat",
-      backgroundSize: 24 * W + "px " + SHEET.h * SCALE + "px",
+      backgroundSize: FRAMES * W + "px " + SHEET.h * SCALE + "px",
       imageRendering: "pixelated",
       pointerEvents: "none",
       zIndex: 8,
@@ -81,7 +82,7 @@
     let frame;
     switch (s.state) {
       case "run": {
-        frame = anim("run", 11, true).frame;
+        frame = anim("run", 12, true).frame;
         s.x += s.dir * SPEED * dt;
         s.next -= dt;
         if (s.queue.length) set(s.queue.shift());
