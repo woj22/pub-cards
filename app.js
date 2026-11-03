@@ -184,13 +184,13 @@
     if (resume) {
       code = resume.code;
       game = resume.game;
-      if (!Array.isArray(game.settings.packs)) game.settings.packs = window.PACKS.map((p) => p.id);
+      if (!Array.isArray(game.settings.packs)) game.settings.packs = window.PACKS.filter((p) => !p.off).map((p) => p.id);
       for (const p of game.players) if (!p.bot && p.id !== myId) p.connected = false;
       const me = game.players.find((p) => p.id === myId);
       if (me) me.connected = true;
     } else {
       code = code4();
-      game = Core.newGame(myId, myName, window.PACKS.map((p) => p.id));
+      game = Core.newGame(myId, myName, window.PACKS.filter((p) => !p.off).map((p) => p.id));
       Core.updateSettings(game, myId, {});
     }
     status = "Opening the pub…";
