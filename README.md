@@ -12,7 +12,8 @@ answers.
 
 1. Open the game and press **Start a game**.
 2. Send the link (or the room code) to your mates.
-3. When everyone's in, press **Start the game**.
+3. When everyone's in, press **Start the game**. You need 3 players, and
+   bots count.
 
 The host's browser runs the game, so the host needs to keep their tab open.
 If the host reloads by accident, the game picks up where it left off and
@@ -20,8 +21,9 @@ everyone reconnects by themselves.
 
 ## Extras
 
-- **The Bloke Down the Pub**: a bot that plays random cards. He wins more
-  often than he should.
+- **Bots**: up to three (The Bloke Down the Pub, Big Sandra from Bingo and
+  Your Uncle Clive) who play random cards and win more often than they
+  should. With two bots you can try the game on your own.
 - **Random events** (from round 3, about one round in three):
   - *Bank Holiday*: double points.
   - *Rail Replacement*: everyone passes a random card to the left.

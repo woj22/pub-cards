@@ -3,8 +3,13 @@
 (function (root) {
   "use strict";
 
-  const BOT_ID = "bot";
-  const BOT_NAME = "The Bloke Down the Pub";
+  // "~" never appears in a real player's id, so bots can't be impersonated.
+  const BOTS = [
+    { id: "~bot1", name: "The Bloke Down the Pub" },
+    { id: "~bot2", name: "Big Sandra from Bingo" },
+    { id: "~bot3", name: "Your Uncle Clive" },
+  ];
+  const isBotId = (id) => typeof id === "string" && id.charAt(0) === "~";
 
   const EVENTS = {
     bankHoliday: { name: "Bank Holiday", text: "Double points this round." },
@@ -34,7 +39,7 @@
       v: 1,
       phase: "lobby",
       hostId,
-      settings: { target: 7, handSize: 10, bot: true, events: true, blanks: 2, swapCost: 1 },
+      settings: { target: 7, handSize: 10, bots: 1, events: true, blanks: 2, swapCost: 1 },
       players: [mkPlayer(hostId, hostName)],
       promptDeck: [],
       answerDeck: [],
@@ -50,7 +55,7 @@
   }
 
   function mkPlayer(id, name) {
-    return { id, name, score: 0, hand: [], blanks: 0, connected: true, bot: id === BOT_ID };
+    return { id, name, score: 0, hand: [], blanks: 0, connected: true, bot: isBotId(id) };
   }
 
   function humans(s) {
@@ -103,12 +108,9 @@
   }
 
   function setBot(s) {
-    const has = !!player(s, BOT_ID);
-    if (s.settings.bot && !has) {
-      s.players.push(mkPlayer(BOT_ID, BOT_NAME));
-    } else if (!s.settings.bot && has) {
-      s.players = s.players.filter((p) => p.id !== BOT_ID);
-    }
+    const want = BOTS.slice(0, s.settings.bots);
+    s.players = s.players.filter((p) => !p.bot || want.some((b) => b.id === p.id));
+    for (const b of want) if (!player(s, b.id)) s.players.push(mkPlayer(b.id, b.name));
   }
 
   function updateSettings(s, by, patch) {
@@ -116,7 +118,7 @@
     const st = s.settings;
     if (patch.target != null) st.target = clamp(+patch.target, 3, 20);
     if (patch.blanks != null) st.blanks = clamp(+patch.blanks, 0, 5);
-    if (patch.bot != null) st.bot = !!patch.bot;
+    if (patch.bots != null) st.bots = clamp(+patch.bots, 0, BOTS.length);
     if (patch.events != null) st.events = !!patch.events;
     setBot(s);
     return { ok: true };
@@ -129,8 +131,7 @@
   function start(s, by, rnd) {
     if (by !== s.hostId) return { ok: false, error: "Only the host can start." };
     setBot(s);
-    if (humans(s).filter((p) => p.connected).length < 2) return { ok: false, error: "You need at least 2 people to play." };
-    if (active(s).length < 3) return { ok: false, error: "You need 3 players. Add the Bloke Down the Pub or another friend." };
+    if (active(s).length < 3) return { ok: false, error: "You need 3 players. Add a bot or another mate." };
     s.promptDeck = shuffle(s.prompts.map((_, i) => i), rnd);
     s.answerDeck = shuffle(s.answers.map((_, i) => i), rnd);
     s.answerDiscard = [];
@@ -210,10 +211,9 @@
     }
     if (event) note(s, EVENTS[event].name + "! " + EVENTS[event].text);
 
-    const bot = player(s, BOT_ID);
-    if (bot) {
+    for (const bot of s.players.filter((p) => p.bot)) {
       const idx = shuffle(bot.hand.map((_, i) => i), rnd).slice(0, s.round.pick);
-      s.round.subs[BOT_ID] = idx.map((i) => ({ card: bot.hand[i] }));
+      s.round.subs[bot.id] = idx.map((i) => ({ card: bot.hand[i] }));
       bot.hand = bot.hand.filter((_, i) => !idx.includes(i));
     }
     maybeJudge(s, rnd);
@@ -403,7 +403,7 @@
   }
 
   function kick(s, by, id, rnd) {
-    if (by !== s.hostId || id === s.hostId || id === BOT_ID) return { ok: false };
+    if (by !== s.hostId || id === s.hostId || isBotId(id)) return { ok: false };
     setConnected(s, id, false, rnd);
     const p = player(s, id);
     if (p) {
@@ -497,7 +497,7 @@
   }
 
   const api = {
-    BOT_ID,
+    isBotId,
     EVENTS,
     newGame,
     addPlayer,

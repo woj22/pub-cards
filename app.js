@@ -190,7 +190,7 @@
         if (!m || typeof m !== "object") return;
         if (m.t === "hello") {
           const pid = String(m.id || "").slice(0, 24);
-          if (!pid || pid === myId || pid === Core.BOT_ID) return;
+          if (!pid || pid === myId || Core.isBotId(pid)) return;
           // One connection per player: a reconnect replaces the old one.
           for (const [c, p] of connPlayer) if (p === pid && c !== cid) connPlayer.delete(c);
           const r = Core.addPlayer(game, pid, m.name);
@@ -416,7 +416,7 @@
           '<button class="btn" data-act="join">Join</button></div>') +
       '<details class="how"><summary>How to play</summary>' +
       "<p>Each round one player is the judge and reads out a black card. Everyone else plays the funniest white card from their hand. The judge picks a winner, who gets a point. First to the target score wins.</p>" +
-      "<p><b>Extras:</b> The Bloke Down the Pub plays random cards and sometimes wins. Random events can shake up a round. Write-your-own cards let you go off-script. You can spend a point to swap your whole hand. The Pundit reads out each winning card.</p>" +
+      "<p><b>Extras:</b> Up to three bots play random cards and sometimes win, so you can even play on your own. Random events can shake up a round. Write-your-own cards let you go off-script. You can spend a point to swap your whole hand. The Pundit reads out each winning card.</p>" +
       "</details>" +
       (local ? '<p class="small">Local test mode: only works between tabs in this browser.</p>' : "") +
       "</div>"
@@ -452,7 +452,7 @@
   function lobbyHTML() {
     const host = v.me === v.hostId;
     const st = v.settings;
-    const humans = v.players.filter((p) => !p.bot).length;
+    const enough = v.players.filter((p) => p.bot || p.connected).length >= 3;
     return (
       '<div class="lobby">' +
       '<div class="roomcode">Room <b>' + esc(code) + "</b></div>" +
@@ -463,10 +463,10 @@
         ? '<div class="settings">' +
           '<label>First to <select data-set="target">' + [3, 5, 7, 10, 15].map((n) => "<option" + (n === st.target ? " selected" : "") + ">" + n + "</option>").join("") + "</select> points</label>" +
           '<label>Write-your-own cards each <select data-set="blanks">' + [0, 1, 2, 3, 5].map((n) => "<option" + (n === st.blanks ? " selected" : "") + ">" + n + "</option>").join("") + "</select></label>" +
-          '<label class="tog"><input type="checkbox" data-set="bot"' + (st.bot ? " checked" : "") + "> The Bloke Down the Pub plays too</label>" +
+          '<label>Bots <select data-set="bots">' + [0, 1, 2, 3].map((n) => "<option" + (n === st.bots ? " selected" : "") + ">" + n + "</option>").join("") + "</select> (they play random cards)</label>" +
           '<label class="tog"><input type="checkbox" data-set="events"' + (st.events ? " checked" : "") + "> Random events</label>" +
           "</div>" +
-          '<button class="btn primary" data-act="start"' + (humans < 2 ? " disabled" : "") + ">" + (humans < 2 ? "Waiting for mates…" : "Start the game") + "</button>"
+          '<button class="btn primary" data-act="start"' + (enough ? "" : " disabled") + ">" + (enough ? "Start the game" : "Need 3 players: add mates or bots") + "</button>"
         : '<p class="wait">Waiting for ' + esc(name(v.hostId)) + " to start…</p>") +
       punditToggle() +
       '<button class="btn ghost" data-act="leave">Leave</button>' +

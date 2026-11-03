@@ -7,11 +7,12 @@ assert.strictEqual(new Set(A).size, A.length, "duplicate answers");
 for (let seed = 1; seed <= 300; seed++) {
   let x = seed; const rnd = () => ((x = (x * 16807) % 2147483647) / 2147483647);
   const s = C.newGame(P, A, "h", "Host");
-  const n = 2 + (seed % 5);
+  const n = 1 + (seed % 6);
   for (let i = 1; i < n; i++) C.addPlayer(s, "p" + i, "P" + i);
-  C.updateSettings(s, "h", { bot: seed % 2 === 0, events: true, target: 5 });
+  C.updateSettings(s, "h", { bots: seed % 4, events: true, target: 5 });
   const r0 = C.start(s, "h", rnd);
-  if (!r0.ok) { assert(n === 2 && seed % 2 === 1, r0.error); continue; }
+  if (!r0.ok) { assert(n + (seed % 4) < 3, r0.error); continue; }
+  assert(n + (seed % 4) >= 3);
   let steps = 0;
   while (s.phase !== "gameover" && steps++ < 2000) {
     const humans = s.players.filter((p) => !p.bot && p.connected);
