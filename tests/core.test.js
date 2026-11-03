@@ -1,16 +1,22 @@
 const assert = require("assert");
 const C = require("../core.js");
-global.window = {}; require("../cards.js");
-const P = window.PROMPTS, A = window.ANSWERS;
-assert(P.length >= 60 && A.length >= 250, "deck size");
-assert.strictEqual(new Set(A).size, A.length, "duplicate answers");
+global.window = {};
+require("../cards.js");
+require("../cards-filthy.js");
+require("../cards-cah.js");
+const PACKS = window.PACKS;
+for (const p of PACKS) {
+  assert(p.prompts.length >= 20 && p.answers.length >= 80, p.id + " deck size");
+  assert.strictEqual(new Set(p.answers).size, p.answers.length, p.id + " duplicate answers");
+  for (const t of p.prompts) assert(C.blanks(t) >= 1 && (t.match(/_/g) || []).length <= 2, t);
+}
 for (let seed = 1; seed <= 300; seed++) {
   let x = seed; const rnd = () => ((x = (x * 16807) % 2147483647) / 2147483647);
-  const s = C.newGame(P, A, "h", "Host");
+  const s = C.newGame("h", "Host", PACKS.filter((p, i) => (seed >> i) & 1 || i === 0).map((p) => p.id));
   const n = 1 + (seed % 6);
   for (let i = 1; i < n; i++) C.addPlayer(s, "p" + i, "P" + i);
   C.updateSettings(s, "h", { bots: seed % 4, events: true, target: 5 });
-  const r0 = C.start(s, "h", rnd);
+  const r0 = C.start(s, "h", rnd, PACKS);
   if (!r0.ok) { assert(n + (seed % 4) < 3, r0.error); continue; }
   assert(n + (seed % 4) >= 3);
   let steps = 0;

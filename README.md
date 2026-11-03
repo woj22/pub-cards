@@ -4,9 +4,27 @@ A party card game for terrible people, proper British edition. One person
 hosts, everyone else joins by link or a four-letter room code. It runs in the
 browser on phones and laptops, with no accounts and no server to pay for.
 
-All the cards are original and live in [`cards.js`](cards.js). Add your own:
-a `_` in a prompt marks a blank, and prompts with two blanks ask for two
-answers.
+Adults only. The host picks which packs of cards to play with:
+
+- **Cards Against Humanity (UK)**: the CAH base set with the UK edition
+  cards, in [`cards-cah.js`](cards-cah.js). US spellings are swapped for
+  British ones, and a handful of cards are left out: ones aimed at ethnic or
+  religious groups, disabled or trans people, or real victims of abuse.
+- **Pub Cards: Proper British**: original cards in [`cards.js`](cards.js).
+- **Pub Cards: Absolutely Filthy**: ruder original cards in
+  [`cards-filthy.js`](cards-filthy.js).
+
+Add your own: a `_` in a prompt marks a blank, and prompts with two blanks
+ask for two answers.
+
+### Licence
+
+The Cards Against Humanity text is © Cards Against Humanity LLC and is used
+under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+(card data from
+[json-against-humanity](https://github.com/crhallberg/json-against-humanity)).
+So this game must stay free, and that file stays under the same licence. Pub
+Cards isn't affiliated with or endorsed by Cards Against Humanity.
 
 ## Playing
 

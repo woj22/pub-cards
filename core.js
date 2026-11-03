@@ -34,18 +34,18 @@
     return Math.max(1, Math.min(2, n));
   }
 
-  function newGame(prompts, answers, hostId, hostName) {
+  function newGame(hostId, hostName, packIds) {
     return {
       v: 1,
       phase: "lobby",
       hostId,
-      settings: { target: 7, handSize: 10, bots: 1, events: true, blanks: 2, swapCost: 1 },
+      settings: { target: 7, handSize: 10, bots: 1, events: true, blanks: 2, swapCost: 1, packs: packIds || [] },
       players: [mkPlayer(hostId, hostName)],
       promptDeck: [],
       answerDeck: [],
       answerDiscard: [],
-      prompts,
-      answers,
+      prompts: [],
+      answers: [],
       round: null,
       roundNo: 0,
       judgeIdx: -1,
@@ -120,6 +120,7 @@
     if (patch.blanks != null) st.blanks = clamp(+patch.blanks, 0, 5);
     if (patch.bots != null) st.bots = clamp(+patch.bots, 0, BOTS.length);
     if (patch.events != null) st.events = !!patch.events;
+    if (Array.isArray(patch.packs)) st.packs = patch.packs.filter((x) => typeof x === "string").slice(0, 20);
     setBot(s);
     return { ok: true };
   }
@@ -128,10 +129,16 @@
     return Math.max(lo, Math.min(hi, isNaN(n) ? lo : Math.round(n)));
   }
 
-  function start(s, by, rnd) {
+  // packs: every available pack, as {id, prompts, answers}. The settings say
+  // which ones are in play.
+  function start(s, by, rnd, packs) {
     if (by !== s.hostId) return { ok: false, error: "Only the host can start." };
     setBot(s);
     if (active(s).length < 3) return { ok: false, error: "You need 3 players. Add a bot or another mate." };
+    const chosen = (packs || []).filter((p) => s.settings.packs.includes(p.id));
+    if (!chosen.length) return { ok: false, error: "Pick at least one pack of cards." };
+    s.prompts = [].concat(...chosen.map((p) => p.prompts));
+    s.answers = [].concat(...chosen.map((p) => p.answers));
     s.promptDeck = shuffle(s.prompts.map((_, i) => i), rnd);
     s.answerDeck = shuffle(s.answers.map((_, i) => i), rnd);
     s.answerDiscard = [];

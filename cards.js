@@ -1,6 +1,7 @@
-// Original cards for Pub Cards. "_" marks a blank. A prompt with two blanks
-// asks for two answers, played in order.
-window.PROMPTS = [
+// Original cards for Pub Cards (free to use however you like). "_" marks a
+// blank. A prompt with two blanks asks for two answers, played in order.
+window.PACKS = window.PACKS || [];
+window.PACKS.push({ id: "pub", name: "Pub Cards: Proper British", prompts: [
   "What's the real reason the 07:42 to Waterloo was cancelled?",
   "Nothing says \"British summer\" like _.",
   "My nan's secret to a long life? _.",
@@ -74,9 +75,7 @@ window.PROMPTS = [
   "I'd rather eat _ than watch another episode of _.",
   "What would Paddington never forgive?",
   "The Highway Code now includes a section on _.",
-];
-
-window.ANSWERS = [
+], answers: [
   "A Tesco meal deal eaten in a lay-by",
   "Rail replacement bus services",
   "A lukewarm sausage roll",
@@ -356,4 +355,4 @@ window.ANSWERS = [
   "A traffic jam caused by a single sheep",
   "Saying \"right then\" and slapping your knees",
   "A cold bath and a sad sandwich",
-];
+]});

@@ -146,3 +146,4 @@ button.entry:disabled { cursor: default; }
   .card.white { font-size: 0.92rem; min-height: 100px; padding: 12px; }
   .card.black { font-size: 1.2rem; }
 }
+.small a { color: var(--muted); }

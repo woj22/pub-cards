@@ -125,7 +125,7 @@
         r = Core.updateSettings(game, pid, m.patch || {});
         break;
       case "start":
-        r = Core.start(game, pid, rnd);
+        r = Core.start(game, pid, rnd, window.PACKS);
         break;
       case "play":
         r = Core.play(game, pid, m.plays, rnd);
@@ -184,12 +184,13 @@
     if (resume) {
       code = resume.code;
       game = resume.game;
+      if (!Array.isArray(game.settings.packs)) game.settings.packs = window.PACKS.map((p) => p.id);
       for (const p of game.players) if (!p.bot && p.id !== myId) p.connected = false;
       const me = game.players.find((p) => p.id === myId);
       if (me) me.connected = true;
     } else {
       code = code4();
-      game = Core.newGame(window.PROMPTS, window.ANSWERS, myId, myName);
+      game = Core.newGame(myId, myName, window.PACKS.map((p) => p.id));
       Core.updateSettings(game, myId, {});
     }
     status = "Opening the pub…";
@@ -429,6 +430,7 @@
       "<p>Each round one player is the judge and reads out a black card. Everyone else plays the funniest white card from their hand. The judge picks a winner, who gets a point. First to the target score wins.</p>" +
       "<p><b>Extras:</b> Up to three bots play random cards and sometimes win, so you can even play on your own. Random events can shake up a round. Write-your-own cards let you go off-script. You can spend a point to swap your whole hand. The Pundit reads out each winning card.</p>" +
       "</details>" +
+      '<p class="small">Adults only. Includes cards from <a href="https://www.cardsagainsthumanity.com/">Cards Against Humanity</a>, used under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>. Not affiliated with them.</p>' +
       (local ? '<p class="small">Local test mode: only works between tabs in this browser.</p>' : "") +
       "</div>"
     );
@@ -475,10 +477,14 @@
           '<label>First to <select data-set="target">' + [3, 5, 7, 10, 15].map((n) => "<option" + (n === st.target ? " selected" : "") + ">" + n + "</option>").join("") + "</select> points</label>" +
           '<label>Write-your-own cards each <select data-set="blanks">' + [0, 1, 2, 3, 5].map((n) => "<option" + (n === st.blanks ? " selected" : "") + ">" + n + "</option>").join("") + "</select></label>" +
           '<label>Bots <select data-set="bots">' + [0, 1, 2, 3].map((n) => "<option" + (n === st.bots ? " selected" : "") + ">" + n + "</option>").join("") + "</select> (they play random cards)</label>" +
+          "<div><b>Cards</b>" +
+          window.PACKS.map((p) => '<label class="tog"><input type="checkbox" data-pack="' + esc(p.id) + '"' + (st.packs.includes(p.id) ? " checked" : "") + "> " + esc(p.name) + ' <span class="small">(' + p.answers.length + ")</span></label>").join("") +
+          "</div>" +
           '<label class="tog"><input type="checkbox" data-set="events"' + (st.events ? " checked" : "") + "> Random events</label>" +
           "</div>" +
           '<button class="btn primary" data-act="start"' + (enough ? "" : " disabled") + ">" + (enough ? "Start the game" : "Need 3 players: add mates or bots") + "</button>"
-        : '<p class="wait">Waiting for ' + esc(name(v.hostId)) + " to start…</p>") +
+        : '<p class="small">Cards: ' + window.PACKS.filter((p) => st.packs.includes(p.id)).map((p) => esc(p.name)).join(", ") + "</p>" +
+          '<p class="wait">Waiting for ' + esc(name(v.hostId)) + " to start…</p>") +
       punditToggle() +
       '<button class="btn ghost" data-act="leave">Leave</button>' +
       "</div>"
@@ -728,7 +734,10 @@
 
   app.addEventListener("change", (ev) => {
     const t = ev.target;
-    if (t.dataset.set) {
+    if (t.dataset.pack) {
+      const packs = [...app.querySelectorAll("[data-pack]")].filter((x) => x.checked).map((x) => x.dataset.pack);
+      send({ t: "settings", patch: { packs } });
+    } else if (t.dataset.set) {
       const val = t.type === "checkbox" ? t.checked : +t.value;
       send({ t: "settings", patch: { [t.dataset.set]: val } });
     } else if (t.dataset.act === "sith") {
